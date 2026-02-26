@@ -21,4 +21,15 @@ This work is subject to the MIT License (https://opensource.org/licenses/MIT)
 #include <unistd.h>
 
 
+// define all of my helper functions
+int is_ogar(const char *path);
+int x_method();
+int z_method();
+int c_method();
+int q_method();
+int a_method();
+int v_method();
+int X_method();
+int compress();
 
+// functions
