@@ -31,7 +31,7 @@ OGAR ARCHIVE FORMAT (HIGH-LEVEL ASCII MAP)
   | record 1                      |
   |   ...                         |
   +-------------------------------+
-  | TOC (table of contents)       |  <-- written at end (optional but recommended)
+  | TOC (table of contents)       |  <-- written at end
   |  uint64_t count               |
   |  repeated entries:            |
   |    name_len, name             |
@@ -48,6 +48,8 @@ OGAR ARCHIVE FORMAT (HIGH-LEVEL ASCII MAP)
 
 // Marks the TOC footer region (used to sanity-check TOC).
 #define OGAR_TOC_MAGIC "OTOC"
+
+#define OGAR_VERSION 1
 
 typedef enum {
     OGAR_COMP_NONE = 0, // Store file bytes as-is
@@ -79,11 +81,31 @@ typedef struct {
     uint8_t  comp_method;   // ogar_comp_t
 } ogar_toc_entry_t;
 
+// ogar header struct - fixed-size header written at the start of the archive
+typedef struct {
+    char     magic[OGAR_MAGIC_LEN]; // must match OGAR_MAGIC
+    uint8_t  version;               // OGAR_VERSION
 
+    uint16_t header_bytes;          // total header bytes (including padding)
+    uint8_t  pad_bytes;             // 0..7 padding bytes after this struct
+    uint8_t  reserved0;             // reserved (set to 0)
 
+    uint64_t toc_offset;            // byte offset of TOC start (0 if no TOC yet)
+    uint64_t toc_bytes;             // total size of TOC section in bytes (0 if no TOC yet)
+} ogar_header_t;
 
+// ogar record header struct
+typedef struct {
+    char     rec_magic[4];    // "OREC"
+    uint32_t name_len;        // filename length (no null terminator)
 
+    uint8_t  comp_method;     // ogar_comp_t
+    uint8_t  reserved1[3];    // explicit padding
 
-
+    uint32_t crc32;           // CRC32 of raw (uncompressed) bytes
+    uint64_t raw_size;        // uncompressed size
+    uint64_t stored_size;     // bytes stored in archive (compressed or raw)
+    uint32_t meta_bytes;      // metadata block size (usually sizeof(ogar_meta_t))
+} ogar_record_hdr_t;
 
 #endif // OGAR_H
