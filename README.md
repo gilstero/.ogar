@@ -1,7 +1,3 @@
-Got it — here is a **fully copy-paste ready `README.md` in pure Markdown**.
-
-You can paste this directly into `README.md`.
-
 ---
 
 # OGAR – A Custom Archive Format in C
